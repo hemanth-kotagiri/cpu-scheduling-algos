@@ -1,58 +1,61 @@
-def getProcessArrivalAndBursts():
-    n = int(input("Enter number of processess: "))
+class FCFS:
+    """ A class to implement FCFS Algorithm for Process Scheduling """
+
     times = []
 
-    while n:
-        times.append(list(map(int, input().split())))
-        n -= 1
+    def __init__(self):
+        n = int(input("Enter number of processess: "))
 
-    return times
+        print("Arrival Time | Burst Time")
+        while n:
+            self.times.append(list(map(int, input().split())))
+            n -= 1
+
+    def showProcessArrivalAndBursts(self):
+        for i in range(len(self.times)):
+            print(
+                f"Proess {i + 1} Arrived At : {self.times[i][0]}  With Burst time : {self.times[i][1]}")
+
+    def firstComeFirstServe(self):
+
+        # Sorting the processess by the arrival time
+        temp = sorted(self.times, key=lambda x: x[0])
+
+        completionTimes = []
+        turnAroundTimes = []
+        waitingTimes = []
+
+        for process in temp:
+
+            # completion times for the current process
+            if not completionTimes:
+                completionTimes.append(sum(process))
+            else:
+                currentCompletion = completionTimes[-1] + process[1]
+
+                # Handling the case when the cpu is idle
+                idlePeriod = process[0] - completionTimes[-1]
+                if idlePeriod > 0:
+                    currentCompletion += idlePeriod
+
+                completionTimes.append(currentCompletion)
+
+            # turn around time: Completing time - Arrival Time
+            turnAroundTimes.append(completionTimes[-1] - process[0])
+
+            # Waiting time: Turn around time - burst time
+            waitingTimes.append(turnAroundTimes[-1] - process[1])
+
+        print("PID | CT | TAT | WT")
+        id = 1
+        for i, j, k in zip(completionTimes, turnAroundTimes, waitingTimes):
+            print(f"P{id}  | {i} | {j}  | {k}")
+            id += 1
+
+        print(
+            f"Average Turn Around Time: {sum(turnAroundTimes)/len(turnAroundTimes)}")
+        print(f"Average Waiting Time: {sum(waitingTimes)/len(waitingTimes)}")
 
 
-def showProcessArrivalAndBursts(times):
-    # print("PROCESS | ARRIVAL TIME | BURST TIME")
-    for i in range(len(times)):
-        print(f"Proess {i + 1} Arrived At : {times[i][0]}  With Burst time : {times[i][1]}")
-
-
-def firstComeFirstServe(times):
-    dup = sorted(times, key=lambda x:x[0])
-    print(dup)
-    completionTimes = []
-    turnAroundTimes = []
-    waitingTimes = []
-    for process in dup:
-
-        # completion times for each process
-
-        if not completionTimes:
-            completionTimes.append(process[1])
-        else: completionTimes.append(completionTimes[-1] + process[1])
-
-        # turn around time: Completing time - Arrival Time
-
-        turnAroundTimes.append(completionTimes[-1] - process[0])
-    
-        # Waiting time
-        waitingTimes.append(turnAroundTimes[-1] - process[1])
-
-    for i, j in zip(completionTimes, turnAroundTimes):
-        print(f"Completing Time: {i} and Turn Around time: {j}")
-    
-    print(f"Avg TAT: {sum(turnAroundTimes)/len(turnAroundTimes)}")
-    print(f"Avg WT: {sum(waitingTimes)/len(waitingTimes)}")
-    print(f"TATs: {turnAroundTimes}")
-    print(f"WTs: {waitingTimes}")
-
-
-
-
-
-# Get the arrival times, burst times for processess
-times = getProcessArrivalAndBursts()
-
-# print("given processess without order")
-# showProcessArrivalAndBursts(times)
-
-# Perform the algorithm
-firstComeFirstServe(times)
+demo = FCFS()
+demo.firstComeFirstServe()
